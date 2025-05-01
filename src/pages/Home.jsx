@@ -10,9 +10,9 @@ export default function Home() {
     const name = input.toLowerCase().replace('.sol', '');
     setStatus('checking');
     try {
-      const res = await fetch(`https://sns-id.genesysgo.net/mainnet-beta/search/${name}`);
+      const res = await fetch(`https://sns-id.xyz/api/search/${name}`);
       const data = await res.json();
-      if (data.found === false) {
+      if (data.isAvailable === true) {
         setStatus('available');
       } else {
         setStatus('taken');
