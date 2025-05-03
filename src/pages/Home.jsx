@@ -6,13 +6,20 @@ export default function Home() {
 
   const checkAvailability = async () => {
     setStatus(null);
-    if (!input.trim()) return;
-    const name = input.toLowerCase().replace('.sol', '');
+    const name = input.toLowerCase().replace('.sol', '').trim();
+    if (!name) return;
+
     setStatus('checking');
+
     try {
-      const res = await fetch(`https://sns-id.xyz/api/search/${name}`);
+      const res = await fetch('https://sns-api.bonfida.com/v2/domains/bulk-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domains: [name] })
+      });
+
       const data = await res.json();
-      if (data.isAvailable === true) {
+      if (!Array.isArray(data) || data.length === 0) {
         setStatus('available');
       } else {
         setStatus('taken');
@@ -79,7 +86,7 @@ export default function Home() {
           </div>
         )}
         {status === 'taken' && <p style={{ color: 'orange' }}>❌ Ce nom est déjà pris.</p>}
-        {status === 'error' && <p style={{ color: 'red' }}>Erreur de connexion à l'API SNS.</p>}
+        {status === 'error' && <p style={{ color: 'red' }}>Erreur de connexion à l'API Bonfida.</p>}
       </div>
     </div>
   );
