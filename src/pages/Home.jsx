@@ -4,30 +4,30 @@ export default function Home() {
   const [input, setInput] = useState('');
   const [status, setStatus] = useState(null);
 
-  const checkAvailability = async () => {
+  const checkAvailability = () => {
     setStatus(null);
     const name = input.toLowerCase().replace('.sol', '').trim();
     if (!name) return;
 
     setStatus('checking');
 
-    try {
-      const res = await fetch('https://sns-api.bonfida.com/v2/domains/bulk-search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domains: [name] })
-      });
-
-      const data = await res.json();
-      if (!Array.isArray(data) || data.length === 0) {
-        setStatus('available');
-      } else {
-        setStatus('taken');
+    window.$.ajax({
+      url: 'https://sns-api.bonfida.com/v2/domains/bulk-search',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ domains: [name] }),
+      success: function (response) {
+        if (Array.isArray(response) && response.length > 0) {
+          setStatus('taken');
+        } else {
+          setStatus('available');
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error('Erreur AJAX:', status, error);
+        setStatus('error');
       }
-    } catch (err) {
-      console.error(err);
-      setStatus('error');
-    }
+    });
   };
 
   const mintUrl = `https://www.sns.id/search/single?search=${input.toLowerCase().replace('.sol','')}`;
